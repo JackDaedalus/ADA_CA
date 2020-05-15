@@ -1,0 +1,102 @@
+## CA One Advanced Data Analytics : Modeule Code B8IT109
+## Student Name : Ciaran Finnegan
+
+## Student Number : 10524150
+
+## Question Two - R Shniy Application performing discrete and continous probability 
+## modelling on attributes in the Pima Indian Diabetes dataset
+
+diabetes <- read.csv("semantic/pima-indians-diabetes.csv")
+
+####################################################################################################
+# Read the Pima Indian Diabetes File and perform some initial data clean up and manipulation
+diabetes[, 2:6][diabetes[, 2:6] == 0] <- NA # replaces all zero values from column two to six with NA
+diabetes <- na.omit(diabetes) # now we omit all NA values
+####################################################################################################
+
+#####################################################################################################
+# Discrete Variables in Pima Indian dataset - BMI
+#####################################################################################################
+
+# Take 'pregnancies'
+head(diabetes)
+table(diabetes$Pregnancies)
+tabPreg = table(diabetes$Pregnancies)
+
+# X = Pregnancies  : Model this using a multinomial model  - or maybe the Poisson model? This is multinomial
+
+# Estimate the parameters = c(p_0,p_1,p_2,p_3,p_4,p_5,p_6,p_7,p_8,p_9,p_10,p_11,p_12,p_13,p_14,p_15,p_16,p_17)
+p_hat = tabPreg/sum(tabPreg)
+#sum(tabPreg)
+p_hat
+
+
+# Carry out a prediction
+# See start of video
+
+
+
+
+
+
+# Take 'pregnancies'
+# Number of Pregnancies  : Model this using a Poisson model 
+head(diabetes)
+table(diabetes$Pregnancies)
+
+# Use a Poisson Model to quantify Pregnancies
+lamda=mean(diabetes$Pregnancies)  # Parameter
+
+# Make Prediction 
+data=rpois(1000, lamda)
+pred=round(mean(data))
+pred
+
+
+###############################################################################################################
+
+# Take 'Outcome' - use a Bernoulli Model
+head(diabetes)
+table(diabetes$Outcome)
+tabOut = table(diabetes$Outcome)
+tabOut
+
+# 'Outcome' could be modelled using Bernoulli (p) Probability Model. The values are binary : '0' or '1' (denoting outcome of diabetic or not)
+
+p_hat=tabOut[2]/sum(tabOut) # Estimation of p - relative frequency of '1'.
+
+
+# Prediction using standard benchmark of 1000 generated samples
+# We can use a binomial function with n = 1 for bernoulli
+dataOut=rbinom(1000,1,p_hat)
+
+# Count the number of '1's
+sum(dataOut) 
+
+# Sum of 1 values is <342>, out of 1000. Therefore prediction is zero since the frequency of zero is higher (<658>).
+
+
+###############################################################################################################
+
+###############################################################################################################
+
+# # Take 'SkinThickness' - use a Poisson model
+head(diabetes)
+table(diabetes$SkinThickness)
+tabSkin = table(diabetes$SkinThickness)
+sort(tabSkin)
+
+# The range of values in Skin Thickness is between 7 and 63 (this is after data clean-up).
+# A Multinominal or Binomial model will not be appropriate there we will use a Poisson Model to quantify SkinThickness.
+# The number of entries for skin thickness are large and the probability of a given attribute applying to a given individual is small
+
+lamdaST=mean(diabetes$SkinThickness)  # Parameter
+
+# Make Prediction. Generate 1000 samples with the lambda parameter 
+dataST=rpois(1000, lamdaST)
+
+# Take mean of the samples and round to get an integer value, which is in line with the nature of the DBF data in this dataset
+predST=round(mean(dataST)) 
+predST
+
+
