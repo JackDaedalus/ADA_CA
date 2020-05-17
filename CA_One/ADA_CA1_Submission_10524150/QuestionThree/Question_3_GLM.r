@@ -10,10 +10,12 @@
 
 library(caTools) # useful to split data to training and test datasets
 
+## Set Working Directory Accordingly
+
 
 ####################################################################################################
 # Read the Pima Indian Diabetes File and perform some initial data clean up and manipulation
-diabetes <- read.csv("semantic/pima-indians-diabetes.csv")
+diabetes <- read.csv("pima-indians-diabetes.csv")
 diabetes[, 2:6][diabetes[, 2:6] == 0] <- NA # replaces all zero values from column two to six with NA
 diabetes <- na.omit(diabetes) # now we omit all NA values
 ####################################################################################################

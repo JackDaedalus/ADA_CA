@@ -11,15 +11,15 @@
 ## The initial tab displayed is the answer to Question 1(a)
 
 #########################
+library(shiny)
+library(shinythemes)
 library(semantic.dashboard)
 library(reshape2)
 library(ggplot2)
 library(plotly)
 library(ggcorrplot)
-library(shiny)
-library(semantic.dashboard)
+library(dplyr)
 library(DT)
-library(shinythemes)
 #########################
 
 ## This CA uses many standard R libraries, including an open source R Shiny package for a Semantic Dashbaord

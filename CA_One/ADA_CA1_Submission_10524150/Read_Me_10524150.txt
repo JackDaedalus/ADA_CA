@@ -7,7 +7,8 @@
 
 ## May 2020
 
-## 
+## When running final tests on this CA, prior to submission in a new RStudio Cloud project, it was necessary to 
+## re-install the library packages and set 'working directories' accordingly.
 
 
 ## All questions were solved/analysed using RStudio Cloud

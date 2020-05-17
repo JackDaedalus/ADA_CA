@@ -8,10 +8,12 @@
 ## Question Two - R program performing discrete and continous probability modelling on attributes 
 ## in the Pima Indian Diabetes dataset
 
+## Set Working Directory Accordingly
+
 
 ########################################################################################################################
 # Read the Pima Indian Diabetes File and perform some initial data clean up and manipulation
-diabetes <- read.csv("semantic/pima-indians-diabetes.csv")
+diabetes <- read.csv("pima-indians-diabetes.csv")
 diabetes[, 2:6][diabetes[, 2:6] == 0] <- NA # replaces all zero values from column two to six with NA
 diabetes <- na.omit(diabetes) # now we omit all NA values
 ########################################################################################################################
@@ -104,6 +106,7 @@ range(xDBF)
 ##   ----- 'Outcome' - Parameter - Bernoulli Model  ----- 
 
 p_hat=tabOut[2]/sum(tabOut) # Estimation of p - relative frequency of '1'.
+p_hat
 
 ########  ----- 'Outcome' ------  ###########
 
@@ -113,6 +116,7 @@ p_hat=tabOut[2]/sum(tabOut) # Estimation of p - relative frequency of '1'.
 ##   ----- Skin Thickness - Parameter - Poisson Model  ----- 
 
 lamdaST=mean(diabetes$SkinThickness)  # Parameter
+lamdaST
 
 ########  ----- SkinThickness ------  ###########
 
