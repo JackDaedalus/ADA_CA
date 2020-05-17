@@ -1,0 +1,85 @@
+## CA One Advanced Data Analytics : Module Code B8IT109
+## Student Name : Ciaran Finnegan
+
+## March 2019 Intake - Fri/Sat
+
+## Student Number : 10524150
+
+## May 2020
+
+## When running final tests on this CA, prior to submission in a new RStudio Cloud project, it was necessary to 
+## re-install the library packages and set 'working directories' accordingly.
+
+
+## All questions were solved/analysed using RStudio Cloud
+## All question use the Pima Indian Diabetes dataset. This is a well known dataset in academic circles and 
+## requires relatively little introduction.
+
+## For the purposes of this CA it contained a sufficient mix of discrete and continuous variables and just enough
+## data rows on which to perform visual, and other analysis. The size of the dataset meant that processing 
+## overhead would not be an issue while developing the solutions.
+
+## Question 1 uses an R Shiny dashboard
+
+## Questions 2 and 3 are developed as standard R files in RStudio Cloud. They are run individually.
+
+## For simplicity, each Question solution loads its own copy of the Pima Indian dataset CSV file from within the 
+## same directory as the R file for that question.
+
+
+###############################################################################################################
+## Question One : The solution is presented via a Shiny R Dashboard, using elements of the Semantic UI library.
+###############################################################################################################
+
+## To run. 
+
+ - Navigate from the root folder to The 'QuestionOne' folder.
+ 
+ - Run the 'Question_1_RUNME.r' program. This is just a simple script to execute the Shiny R dashboard program in the 'CA Dashboard' folder.
+ 
+ - The dashboard is a Shiny R application. Both the Shiny UI Function and Shiny Server function are contained in the same 'app.r' file. This type of construction is possible
+ in later versions of R.
+ 
+ - The app.r rile starts routines to load and clean up the Pima Indian dataset. Hence the number of rows in the 'active' dataset in the question solutions is less
+ than the original size.
+ 
+ - Additional small bespoke R functions have also been written by me (before the location of Shiny UI/Server function in the file) in order to streamline some of the
+ analysis.
+ 
+ - Routines from the Semantic UI library were included to add richness to the Shiny R dashboard. 
+ 
+ - Each sub section of the answers to Question 1 are presented in a separate tab on the dashboard.
+ 
+ 
+ 
+###############################################################################################################
+## Question Two : The solution is presented as an R rile.
+###############################################################################################################
+
+## To run. 
+
+ - Navigate from the root folder to The 'QuestionTwo' folder.
+ 
+ - Run the 'Question_2_MODELS.r' program. 
+ 
+ - The output from the R file in RStudio/R Studio Cloud will present the analysis, which is expanded on in the 
+ comments within the R script.
+ 
+ 
+###############################################################################################################
+## Question Three : The solution is presented as an R rile.
+###############################################################################################################
+
+
+## To run. 
+
+ - Navigate from the root folder to The 'QuestionThree' folder. 
+ 
+ - Run the 'Question_3_GLM.r' program. 
+ 
+ - The output from the R file in RStudio/R Studio Cloud will present the analysis, which is expanded on in the 
+ comments within the R script.
+  
+  
+ 
+ 
