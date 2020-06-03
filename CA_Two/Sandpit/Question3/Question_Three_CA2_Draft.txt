@@ -1,0 +1,273 @@
+## CA Two Advanced Data Analytics : Module Code B8IT109
+## Student Name : Ciaran Finnegan
+
+## Student Number : 10524150
+
+## May 2020
+
+
+## Question Three
+
+## References used to call Yahoo Finance API
+## http://statmath.wu.ac.at/~hornik/QFS1/quantmod-vignette.pdf
+## https://stackoverflow.com/questions/26666254/retrieve-monthly-adjusted-stock-quotes-using-the-quantmod-package-in-r
+
+
+#############################################################################################
+
+## Using Yahoo Finance API, select a specific stock market price, apply time series analysis, 
+## consider ‘close price' as your time series variable:
+
+#############################################################################################
+
+
+# 'Quantmod' Package required to access Yahoo Finance API
+library(quantmod)
+library(forecast)
+
+# Create a sata structure that contains stock quote objects
+ETF_Data <- new.env()
+
+# Assign dates to set range for daily stock closing prices.
+# This range of values over 13 months is set to be large enough for later
+# accurate forecasting but not too large to degrade the quality of the 
+# graph visuals.
+sDate <- as.Date("2016-12-01")
+eDate <- as.Date("2018-01-01")
+
+
+# Use the stock price data over the given period of time (above) for chosen company
+# This code is written to allow the selection of different company stock prices
+# to compare trends and choose different time series.
+# The stock chosen is the AIG (American International Group) for the year 2017
+ticker_symbol = "AIG" # AIG
+
+
+# Alternative company stocks - not used.
+#ticker_symbol = "IBM"  # International Business Machines
+#ticker_symbol = "UA" # Under Armour, Inc
+
+
+# Invoke 'getSymbols' function to retrieve to stock price data over the time period for 
+# the chosen company through the Yahoo Finance API
+getSymbols(ticker_symbol, env=ETF_Data, from=sDate, to=eDate, src = "yahoo", symbol.lookup = TRUE)
+
+
+# Load a dataset with the time series of the chosen company stock prices 
+CompanyStockPrices = get(ticker_symbol, envir = ETF_Data)
+# Review the layout of the stock price information in dataset
+head(CompanyStockPrices)
+
+
+# Consider ‘close_price' as your time series variable in the solution to this question
+# Use the quantmod function 'Cl' to isolate the time series for closing prices
+close_price = Cl(CompanyStockPrices)
+# Review initial record in 'close_price' time series
+head(close_price)
+
+
+#############################################################################################
+#############################################################################################
+
+
+
+
+## Q.3 (Part a)
+
+## Using Yahoo Finance API, select a specific stock market price, apply time series analysis, 
+## consider ‘close price' as your time series variable:
+
+##(a) Validate the assumptions using graphical visualization.
+
+## Run functions to look at the structure of the closing price dataset for our chosen stock
+#View(close_price)
+
+## <Screen shot of 'View' output...here>
+
+#str(close_price)
+## <Output.. of str function on 'xts' object>
+
+
+
+## Invoke the 'ts' function on the 'close_price' time series. 
+T <- ts(close_price, frequency = 1)
+
+
+
+## Generate the plot of the time series variable- the range represents the closing prices extracted 
+## from the time range of data (frequency = 1 so every daily closing price is plotted).
+plot(T)
+
+## <Put first plot graph here..>
+
+## We can see that the time series is not particularly stationary in terms of mean or variance
+
+
+## We apply 'diff' and 'log' functions to smooth out the graph plot
+
+## Apply 'diff' function
+tssdiff=diff(T)  # Stationary in mean
+plot(tssdiff)
+
+## <Put diff plot graph here..>
+
+## The plot of 'diff' is more stationary in mean, with an average approximately around zero.
+
+
+## Apply log function
+tssLog = log(T)# Stationary in variance 
+plot(tssLog)
+
+
+## Apply log function, then applying 'diff', to achieve a stationary visualisation in mean and variance
+tssdifflg = diff(log(T))  
+plot(tssdifflg)
+
+## <Put log plot graph here..>
+
+## This graph shows mean as approximately stationary and the variance also stationary between -0.02 and 0.02,
+## apart from a few outliers
+
+
+## ---------------------------------------------------------------------------------------------------------
+## ALSO - consider graphing the data to show normality in the data set maybe using ggplot
+## ---------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+## Q.3 (Part b)
+
+## Fit the optimized model for ‘close price’ and provide the coefficient estimates for the fitted model.
+
+## To compute optimised coefficient estimates for fitted model we have two approaches :-
+## 1:- Apply 'acf' and 'pacf' to get estimation of order, and also estimate parameters.
+## 2:- Apply ARIMA
+
+## It is necessary to apply both methods and see which one has a lower AIC, then determine that method is optimised.
+## Try and find as low a value of AIC as possible  
+
+
+## 1 - Apply 'acf' and 'pacf' to get estimations of 'q' and 'p'
+## acf = autocorrelation function. Gives us the estimation for 'q'
+acf(tssdifflg)  
+
+## <Put acf plot graph here..>
+
+## There are two initial lags outside the boundary, therefore q = 2. (Above or below boundary line is not important).
+
+
+
+## pacf = partial autocorrelation function. Gives is the estimation for 'p'
+pacf(tssdifflg)
+
+## <Put pacf plot graph here..>
+
+## One initial lag is outside are outside the bounds, therefore p = 1
+
+
+## Now use 'arima' function to fit a manual ARIMA; p = 1, (1 diff used), q = 2. The original time series with 
+## closing price is used.
+## ARIMA (p,d,q) Model : Using original time series 'T'
+## Parameter Estimation
+manual.fit <- arima(T, c(1,1,2)) # Fitted Model
+## Display value of 'manual.fit'
+manual.fit
+
+## With p = 1, we see one value for the 'ar1' coefficient
+## With q = 2, we see two values for the 'ma' (moving average) coefficients
+## The values just under the 'ar1', 'ma1', and 'ma2' headings are the estimation
+## of parameters
+
+## We can see the aic (Akaike Information Criterion) value = 533.63
+
+
+
+
+
+## Next we need to apply 'auto.arima' to generate a fitted model
+## 'seasonal' = F - time series does not have a seasonality trend
+auto.fit <- auto.arima(T, seasonal = FALSE)
+auto.fit
+
+## AIC = 530.54
+
+
+## Automated coefficient are lower as 533.63 (Manual) > 530.54 (Auto, non seasonal). Therefore Auto ARIMA is better than manual fitting.
+
+
+
+
+## Q.3 (Part c)
+
+## What is the estimated order for AR and MA?
+auto.fit
+## The best model shows Series: T ARIMA(0,1,1) 
+## Therefore the estimated order for AR is p = 0, and MA is q = 1
+
+
+
+
+## Q.3 (Part d)
+
+## Forecast h=10 step ahead prediction of wage on the plot of the
+## original time series.
+
+
+# The best model to use is the auto fitting - as determined in the analysis in the previous
+## steps in the question.
+auto.fcast <- forecast(auto.fit, h = 10) # Prediction for 10 step ahead
+## Plot this forecast
+plot(auto.fcast)
+
+
+#############################################################################################
+## The forecast graph is still not particularly useful. Howeveer, if we change the 
+## 'seasonal' = T paramer in the auto.arima function then the time series will 
+## incorpoate a seasonality trend
+
+## It is necessary to 'force' the closing price time series into a mult-seasonal
+## time series in order to pick up the time pattern in the data.
+
+## Set up mult-seasonal time series to match a working day period of 13 months (as defined when
+## the stock data was first extracted via the Yahoo API)
+stockSTS <- msts(T,seasonal.periods=c(5,270))
+## Set 'D' parameter in auto.arima function so that the seasonal component in the 
+## data will be picked up
+auto.fitT <- auto.arima(stockSTS, D=1, seasonal = TRUE)
+## Check the aic value
+auto.fitT
+auto.fcastT <- forecast(auto.fitT, h = 10) # Prediction for 10 steps ahead
+
+## Plot this forecast
+plot(auto.fcastT)
+
+
+## <Put forecast plot graph here..>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

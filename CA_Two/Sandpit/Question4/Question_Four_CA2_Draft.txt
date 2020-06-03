@@ -1,0 +1,159 @@
+## CA Two Advanced Data Analytics : Module Code B8IT109
+## Student Name : Ciaran Finnegan
+
+## Student Number : 10524150
+
+## May 2020
+
+
+## Question Four
+
+## Q. 4(Part 1) 
+
+## Use LDA to classify the dataset into few classes so that at least 90% of information 
+## of dataset is explained through new classification. 
+## (Hint: model the variable “qtr” to variables “togo”, “kicker”, and “ydline”). 
+## How many LDs do you choose? Explain the reason.
+
+
+
+## Load MASS library to use LDA function
+library(MASS)
+library(CCA)
+
+
+## Read in the NFL dataset
+link='http://users.stat.ufl.edu/~winner/data/nfl2008_fga.csv'
+datasetNFL=read.csv(link)
+head(datasetNFL)
+#str(datasetNFL)
+
+
+## Minor Clean up of NFL dataset
+sum(is.na(datasetNFL))
+datasetNFL <- na.omit(datasetNFL)
+sum(is.na(datasetNFL))
+
+# Display the values for 'qtr'
+table(datasetNFL$qtr)
+
+
+
+
+## Use LDA function to classify dataset. The output variable is 'qtr' and the input variables are
+##'togo', 'kicker', and 'ydline'.  
+datasetNFL.lda <- lda(qtr~togo+kicker+ydline, data=datasetNFL)
+datasetNFL.lda
+
+## Two LDs are required - LD1 and LD2 - to explain at least 85% of formation of the NFL dataset is explained
+## LD1 explains 61.5%. LD2 explains a further 32%. Hence LD1 and LD2 will explain 93.7 % together.
+
+
+
+
+## Q. 4(Part 2) 
+
+## Apply PCA, and identify the important principle components involving at least 90% of dataset variation. 
+## Explain your decision strategy?
+
+## We only use the input variables for the PCA question.This analysis is a type of 'unsepervised' learning.
+datasetNFL2 = cbind(datasetNFL$togo, datasetNFL$kicker, datasetNFL$ydline)
+fit <- princomp(datasetNFL2, cor = TRUE)
+summary(fit)
+
+## Looking at the 'Cumulative Proportion' output line we can see that Comp1 captures 43.8% of dataset variation.
+## Comp 1 and Comp2 togther capture 77.2% (approx) of dataset variation.
+## However, ll three components (Comp1, Comp2, Comp3) are important to capture 90% of the dataset variation.
+
+
+
+## Plot principle components versus their variance 
+## (Hint: to sketch the plot use the Scree plot).
+loadings(fit)
+plot(fit, type = "lines")
+
+# The Plot confirms that all three components are important. There is no 'bend' in the line indicating that higher
+# components contribute less to the capture of dataset variation
+
+
+
+## Q. 4(Part 3)
+
+## Split the dataset into two sets of variables so that X=(togo, kicker, ydline) and Y=(distance, homekick). 
+## Apply canonical correlation analysis to find the cross-correlation between X and Y. 
+
+
+## Set up 'X' variable
+X <- cbind(datasetNFL$togo, datasetNFL$kicker, datasetNFL$ydline)
+
+## Set up 'Y' variable 
+Y <- cbind(datasetNFL$distance, datasetNFL$homekick)
+cor(X, Y)
+
+
+## What is the correlation between 'ydline' and 'distance'?
+
+## Read three down the X value and one across the Y value
+## The correlation between 'ydline' and 'distance' is equal to '0.998947222'
+## This value shows a high level of correlation between the 'ydline' and 'distance' values
+
+
+
+
+
+
+
+## Q. 4(Part 4) 
+
+## Use K-means clustering analysis to identify the most important classes. 
+## How many classes do you select? Why?
+
+## Again consider the input variables. We use the 'datasetNFL2' dataset because I want to 
+## just consider the 'togo', 'kicker', and 'ydline' input variables.
+
+## K-Mean
+##k.means.fit <- kmeans(datasetNFL2, 4)
+##attributes(k.means.fit)
+
+# Centroids(arithmetic mean)
+##k.means.fit$centers
+
+# Cluster size
+##k.means.fit$size
+
+
+# Generate the plot K-Means clustering
+## Write function for plot generation
+wssplot <- function(datasetNFL2, nc=10, seed=2343){
+  
+  wss <- (nrow(datasetNFL2)-1) * sum(apply(datasetNFL2, 2, var))
+  
+  for (i in 2 : nc){
+    
+    set.seed(seed)
+    wss[i] <- sum(kmeans(datasetNFL2, centers = i)$withinss)
+    
+  }
+  
+  plot(1:nc, wss, type = "b", xlab = "Numbers of Clusters", ylab = "Within Groups Sum of Squares")
+  
+  
+}
+
+# Invoke plot function 
+wssplot(datasetNFL2, nc = 10)
+
+## In the Cluster graph we can see a definite 'elbox' at Number of Clusters = 4.
+## After Cluster 4 the changes in variation are noticeably less 
+## Therefore the main cluster are clusters 1 through to cluster 4.  
+## We would select four classes as an answer to this question.
+
+
+  
+  
+  
+  
+  
+  
+  
+
