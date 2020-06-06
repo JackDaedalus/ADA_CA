@@ -1,0 +1,19 @@
+install.packages("datasets")
+install.packages("party")
+install.package('randomForest') 
+install.packages('ggpubr')
+
+
+
+
+
+
+
+library(datasets)
+library(party)
+library(caTools) # useful to split data to training and test datasets
+require(randomForest) 
+library(e1071) #Naive Bayes
+library(ggpubr)
+library(forecast)
+library(MASS)

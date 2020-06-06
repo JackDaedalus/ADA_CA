@@ -1,0 +1,124 @@
+## CA Two Advanced Data Analytics : Module Code B8IT109
+## Student Name : Ciaran Finnegan  10524150
+
+## Exam Revision
+
+## September 2019
+
+## Question 3 : Regression analysis and support vector machine
+
+# Loading the package ‘datasets’, use the dataset ‘trees’, and consider 
+# ‘Girth’ as the output variable and select the others as the input variables. 
+# Split the dataset into 80% trainset and 20% as the testset (use set.seed(1456)).
+
+library(datasets)
+
+data("trees")
+ds <- data.frame(trees)
+
+## Minor Clean up of dataset
+sum(is.na(ds)) # Check how many rows have missing values
+ds <- na.omit(ds) # Clean the rows with missing values
+sum(is.na(ds)) # Check the missing values are removed
+
+
+
+# Standard analysis
+nrow(ds)
+head(ds)
+tail(ds) 
+summary(ds)
+str(ds)
+
+## For this section of the question use 'set.seed()' to ensure consistency of results
+set.seed(1456)  # The purpose of this is to ensure consistency in the initial prediction
+
+
+## Split the dataset in 80/20 ratio
+sample = sample.split(ds$Girth, SplitRatio=0.80)
+trainset = subset(ds, sample==TRUE)
+testset = subset(ds, sample==FALSE)
+
+# Display the number of rows in each set after splitting the NFL data
+nrow(ds) # Original dataset
+nrow(trainset) # Training set
+nrow(testset) # Test set
+dim(trainset)
+
+
+
+# Q3 (a) Perform linear regression (LR) analysis and derive the optimal predictive model based on the trainset. 
+# ( Hint: Use 𝛼=0.01 for the attribute selection). Predict the test values using the predictive model.
+fit = glm(Girth~., trainset, family = "gaussian")
+summary(fit)
+
+
+# Predictive Model 
+# yhat(i) = that(i) = 9.827 + 0.192(volume)
+# 'Height' not significant
+
+# Predict against testset
+pred=predict(fit, testset)
+pred
+
+
+# To predict for one value - 80
+# newdata=c(1, 80)
+# To predict for multiple values - 0,70,80,100
+# newdata=c(1, 0, 70, 80, 100)
+# predictedvalue=sum(coef(fit)*newdata)
+# #### Using reduced model
+# library(MASS)
+# fit_reduced=stepAIC(fit)
+# coef(fit_reduced)
+
+
+# Q3 (b) Apply support vector regression (SVR) with the kernel ‘poly’ and predict the output variable of the testset.
+fit.svm = svm(Girth~.,data = trainset, kernel='poly')
+summary(fit.svm)
+pred.svm = predict(fit.svm, testset)
+pred.svm
+
+
+
+# Q3 (c) Use RMSE measure to evaluate the accuracy of two models in 100 Monte Carlo runs. Which method does provide more accurate
+
+a=0; mc=100
+
+for(i in 1:mc){ 
+  
+  sample.mc = sample.split(ds$Girth, SplitRatio=0.80)
+  trainset.mc = subset(ds, sample==TRUE)
+  testset.mc = subset(ds, sample==FALSE)
+  
+  
+  
+  # SVM
+  fit.svm.mc = svm(Girth~.,data = trainset.mc, kernel='poly')
+  yhat.svm = predict(fit.svm.mc, testset.mc)
+  
+  # RMSE - SVM
+  mse.svm = sum((yhat.svm-testset.mc$Girth)^2)/nrow(testset.mc)
+  rmse.svm = sqrt(mse.svm)
+  
+  
+  # Linear Regression
+  fit.lm.mc = glm(Girth~., trainset.mc, family = "gaussian")
+  yhat.lm = predict(fit.lm.mc, testset.mc)
+  
+  # Linear Regression - SVM
+  mse.lm = sum((yhat.lm-testset.mc$Girth)^2)/nrow(testset.mc)
+  rmse.lm = sqrt(mse.lm)
+  
+  
+  
+    
+
+  # Evaluate the above code in 100 MC runs 
+  a=a+rmse.svm/mc 
+
+  a=a+(1/mc)*c(rmse.svm,rmse.lm)  
+   
+}
+
+a

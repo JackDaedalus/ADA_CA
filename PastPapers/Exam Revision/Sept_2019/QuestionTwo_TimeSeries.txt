@@ -1,0 +1,106 @@
+## CA Two Advanced Data Analytics : Module Code B8IT109
+## Student Name : Ciaran Finnegan  10524150
+
+## Exam Revision
+
+## September 2019
+
+#install.packages('ggpubr')
+
+library(ggpubr)
+library(forecast)
+
+## Question Two : time series analysis
+## Use data('EuStockMarkets') to load the in-built dataset 'EuStockMarkets' in R, 
+## consider DAX as your time series variable.
+
+data('EuStockMarkets')
+
+
+
+
+## Q2 (a) Validate the assumptions using graphical visualization.
+
+nrow(EuStockMarkets)
+head(EuStockMarkets)
+tail(EuStockMarkets) 
+summary(EuStockMarkets)
+str(EuStockMarkets)
+
+
+
+Dax.df = data.frame(EuStockMarkets)
+t = Dax.df$DAX
+
+tsDax <- ts(t) 
+plot(tsDax)
+
+## We can see that the time series is not particularly stationary in terms of mean or variance
+
+
+## We apply 'diff' and 'log' functions to smooth out the graph plot
+
+## Apply 'diff' function
+tssdiff=diff(tsDax)  # Stationary in mean
+plot(tssdiff)
+
+## <Put diff plot graph here..>
+
+## The plot of 'diff' is more stationary in mean, with an average approximately around <>
+
+
+## Apply log function, then applying 'diff', to achieve a stationary visualisation in mean and variance
+tssdifflg = diff(log(tsDax))  
+plot(tssdifflg)
+
+## <Put log plot graph here..>
+
+ggqqplot(tsDax)
+
+
+
+
+## Q2 (b) Fit the optimized ARIMA model for DAX and provide the coefficient estimates for the fitted model.
+
+## acf = autocorrelation function. Gives us the estimation for 'q'
+acf(tssdifflg)
+# q = 1
+## pacf = partial autocorrelation function. Gives is the estimation for 'p'
+pacf(tssdifflg)
+# p = 0
+## Now use 'arima' function to fit a manual ARIMA; p = 0, (1 diff used), q = 1. The original time series with 
+## closing price is used.
+## ARIMA (p,d,q) Model : Using original time series 'T'
+## Parameter Estimation
+manual.fit <- arima(tsDax, c(0,1,1)) # Fitted Model
+## Display value of 'manual.fit'
+manual.fit
+
+## With p = 0, we see no value for the 'ar1' coefficient
+## With q = 1, we see one value for the 'ma' (moving average) coefficients
+## The values just under the 'ar1', 'ma1', and 'ma2' headings are the estimation
+## of parameters
+
+
+## Next we need to apply 'auto.arima' to generate a fitted model
+## 'seasonal' = F - time series does not have a seasonality trend
+auto.fit <- auto.arima(tsDax, seasonal=F)
+auto.fit
+## 'seasonal' = F - time series does  have a seasonality trend
+auto.fitS <- auto.arima(tsDax, seasonal=T)
+auto.fitS
+
+# Manual better than Auto - see coefficient
+
+
+## Q2 (c) : What is the estimated order for AR and MA?
+
+
+## The best model shows Series: (0,1,1) 
+## Therefore the estimated order for AR is p = 0, and MA is q = 1
+
+
+## Q 2 (d) : Forecast h=10 step ahead prediction of DAX on the plot of the original time series.
+manual.fcast <- forecast(manual.fit, h = 10) # Prediction for 10 step ahead
+## Plot this forecast
+plot(manual.fcast)

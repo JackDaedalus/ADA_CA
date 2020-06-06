@@ -1,0 +1,172 @@
+## CA Two Advanced Data Analytics : Module Code B8IT109
+## Student Name : Ciaran Finnegan  10524150
+
+## Exam Revision
+
+## September 2019
+
+
+## Question One : Naïve Bayes, Decision Tree, Random Forest Loading the package ‘datasets’, 
+## use the dataset ‘readingSkills’ and consider nativeSpeaker as the output variable.
+
+########################################################
+## Use dataset ‘readingskills’
+########################################################
+
+## References 
+## Decision Tree ; https://www.wisdomjobs.com/e-university/r-programming-language-tutorial-1579/r-decision-tree-18325.html
+## Random Forest ; https://www.tutorialspoint.com/r/r_random_forest.htm
+## Naive Bayes (short)  : https://www.geeksforgeeks.org/classification-in-r-programming/
+## Naive Bayes (comprehensive)  :  https://www.edureka.co/blog/naive-bayes-in-r/
+
+#################################
+#install.packages("datasets")
+#install.packages("party")
+#install.package('randomForest') 
+ 
+
+library(datasets)
+library(party)
+library(caTools) # useful to split data to training and test datasets
+library(e1071) 
+require(randomForest)
+library("rpart") 
+
+data(readingSkills)
+#party::readingSkills
+
+##data()
+
+
+nrow(readingSkills)
+head(readingSkills)
+summary(readingSkills)
+str(readingSkills)
+
+
+## Read in airquality dataset - redundant as it is already a preloaded dataset
+df <- data.frame(readingSkills)  # What's the difference with the 'data' function?
+
+
+## Minor Clean up of dataset
+sum(is.na(df)) # Check how many rows have missing values
+df <- na.omit(df) # Clean the rows with missing values
+sum(is.na(df)) # Check the missing values are removed
+
+
+## Look also at 'clean up graph' in above reference
+
+
+## Display the values for 'nativeSpeaker' as this is the variable which the question wants 
+## to model against the input variables.
+## We can see the range of ... values in the 'nativeSpeaker' attribute in the  dataset 
+## (after data clean-up)
+table(df$nativeSpeaker)
+
+## Convert categorical to binary
+df$nativeSpeaker <- as.factor(df$nativeSpeaker)
+levels(df$nativeSpeaker) <- c(0,1)
+#head(df)
+#str(df)
+#table(df$nativeSpeaker)
+
+
+
+
+## Q1 (a) : Split the dataset into 80% as the train-set and 20% as the test-set. (use set.seed(104))
+
+## For this section of the question use 'set.seed()' to ensure consistency of results
+set.seed(104)  # The purpose of this is to ensure consistency in the initial prediction
+
+
+## Split the dataset in 80/20 ratio
+sample = sample.split(df$nativeSpeaker, SplitRatio=0.80)
+trainset = subset(df, sample==TRUE)
+testset = subset(df, sample==FALSE)
+
+# Display the number of rows in each set after splitting the NFL data
+nrow(df) # Original dataset
+nrow(trainset) # Training set
+nrow(testset) # Test set
+dim(trainset)
+
+
+
+## Q1 (b) : Apply Random Forest (RF) algorithm to train the classifier using train-set with 20 trees.
+
+df.rf = randomForest(nativeSpeaker~.,data = trainset, ntree=20)
+df.rf
+
+# Use plot if you want to look for an optional number of trees
+plot(df.rf)
+
+
+## See OneNote code for the code on optimal number of predictors - error terms etc.
+
+ 
+
+## Q1 (c) : Predict the test-set using the trained model of classifier.
+
+pred=predict(df.rf, testset) 
+pred
+
+
+## Q1 (d) : Provide the confusion matrix and obtain the accuracy.
+
+#Root Mean Square Error line - does not apply here
+#rmse=sqrt(sum((pred-testset$nativeSpeaker)^2/nrow(testset)))
+#rmse
+
+
+## Review the layout of the testset of the NFL dataset
+head(testset)
+
+## Convert phat to yhat  
+## Set up so that predicted results from the model are compared against the actual values
+## in the testset data. It is necessary to change the values to represent the binary outcome
+
+## Don't need to do this in this question..
+
+## predictedvalues=rep(0,nrow(testset)) 
+## Assess the number of matching 'Outcomes' in the testset against the output of the model
+#predictedvalues[predres>0.5]=1   # Probability of 'homekick' being 1, if p<0.5 then 'homekick'=0 
+
+
+
+## Compare the values predicted for the testset against the actual output values 
+tab = table(pred, testset$nativeSpeaker)
+## Show a Confusion Matrix to represent the accuracy of the results
+tab
+## Calculate the accuracy as a percentage value
+## This is a sum of the TP (True Pos) + TN (True Neg) / All Results
+accuracy=sum(tab[row(tab)==col(tab)])/sum(tab)
+accuracy
+
+# Q1 (d) : Redo parts b-d to apply either Naïve Bayes or Decision Tree. Which model does provide the higher accuracy?
+# accuracy
+
+## Naive Bayes
+df.nb = naiveBayes(nativeSpeaker~.,data = trainset)
+pred=predict(df.nb, testset)
+tab = table(pred, testset$nativeSpeaker)
+tab
+accuracy=sum(tab[row(tab)==col(tab)])/sum(tab)
+accuracy
+
+
+## Decision Tree
+# decision tree rpart 
+df.dt <- rpart(nativeSpeaker ~., data = trainset, method = "class", control = rpart.control(cp = 0)) 
+pred_dt=predict(df.dt,testset, type='class') # prediction 
+accuracy_dt=mean(pred_dt ==testset$nativeSpeaker)  #accuracy 
+
+############################################################### 
+
+# decision tree using ctree 
+df.ct <- ctree(nativeSpeaker ~., data = trainset) 
+pred_ct=predict(df.ct,testset) 
+accuracy_ct=mean(pred_ct ==testset$nativeSpeaker) 
+acc=c(accuracy_dt, accuracy_ct)  
+acc 
+
+## RMSE example in OneNote
