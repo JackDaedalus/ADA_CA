@@ -2,6 +2,8 @@ install.packages("datasets")
 install.packages("party")
 install.package('randomForest') 
 install.packages('ggpubr')
+install.packages("factoextra")
+
 
 
 
@@ -17,3 +19,5 @@ library(e1071) #Naive Bayes
 library(ggpubr)
 library(forecast)
 library(MASS)
+library(CCA)
+library(factoextra)
