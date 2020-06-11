@@ -1,0 +1,115 @@
+## CA Two Advanced Data Analytics : Module Code B8IT109
+## Student Name : Ciaran Finnegan  10524150
+
+## Exam Revision
+
+## September 2019
+
+## Question 4 : multivariate analysis and unsupervised learning methods
+
+## Use dataset available on 'http://users.stat.ufl.edu/~winner/data/hybrid_reg.csv' , then:
+
+## Read in the NFL dataset
+link='http://users.stat.ufl.edu/~winner/data/hybrid_reg.csv'
+datasetHyb=read.csv(link)
+nrow(datasetHyb)
+head(datasetHyb)
+tail(datasetHyb)
+str(datasetHyb)
+
+
+## Question 5 (a) Use LDA to classify the dataset into few classes so that at
+## least 85% of information of dataset is explained through
+## new classification. (Hint: model the output variable
+## “carclass_id” to input variables “msrp”, “accelrate”, and
+## “mpg”). How many LDs do you choose? Explain the
+## reason.
+
+table(datasetHyb$carclass_id)
+
+datasetHyb.lda = lda(carclass_id~msrp+accelrate+mpg, data = datasetHyb)
+datasetHyb.lda
+
+#Proportion of trace:
+#  LD1    LD2    LD3 
+#0.6945 0.2002 0.1053
+
+# Choose two LDs - together they give approx 90% (at least 85% required in question)
+
+
+
+# Question 5 (b) Apply PCA to input variables, and identify the important
+# principle components involving at least 90% of dataset
+# variation. Explain your decision strategy? Plot principle
+# components versus their variance (Hint: to sketch the plot
+# use the Scree plot).
+
+dsHyb2 = datasetHyb[4:6]
+head(dsHyb2)
+
+dsHyb2.pc = princomp(dsHyb2, cor = TRUE)
+summary(dsHyb2.pc)
+
+# Cumulative Proportion  0.7199935 0.8988829 1.0000000
+
+# All three components important
+
+# Scree Plot principle components against variance
+loadings(dsHyb2.pc)
+plot(dsHyb2.pc, type = "lines")
+
+biplot(dsHyb2.pc)
+
+
+
+## Question 5 (c) Use K-means clustering analysis to input variables and
+## identify the most important classes. How many classes do
+## you select? Why?
+
+wssplot <- function(dsHyb2, nc=10, seed=2343){
+   
+       wss <- (nrow(dsHyb2)-1) * sum(apply(dsHyb2, 2, var))
+       
+         for (i in 2 : nc){
+             
+               set.seed(seed)
+             wss[i] <- sum(kmeans(dsHyb2, centers = i)$withinss)
+             
+             }
+       
+         plot(1:nc, wss, type = "b", xlab = "Numbers of Clusters", ylab = "Within Groups Sum of Squares")
+       
+         
+ }
+ 
+
+wssplot(dsHyb2)
+
+
+# Cluster = 3
+
+dsHyb2.k = kmeans(dsHyb2,3)
+attributes(dsHyb2.k)
+# Centroids(arithmetic mean) 
+dsHyb2.k$centers
+# Cluster size: 
+dsHyb2.k$size
+
+
+
+# Question 5 (d) Split the dataset into two sets of variables so that 
+# X=(msrp, mpgmpge) and Y=( accelrate, mpg). Apply canonical
+# correlation analysis to find the cross-correlation between X
+# and Y. What is the correlation between msrp and mpg?
+
+X <- cbind(datasetHyb$msrp, datasetHyb$mpgmpge)
+Y <- cbind(datasetHyb$accelrate, datasetHyb$mpg)
+
+cor(X, Y)
+
+#[,1]       [,2]
+#[1,]  0.6955779 -0.5318264
+#[2,] -0.3988673  0.6677531
+
+# Correlation between msrp and mpg = -0.5318264
+

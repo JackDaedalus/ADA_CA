@@ -1,0 +1,84 @@
+## CA Two Advanced Data Analytics : Module Code B8IT109
+## Student Name : Ciaran Finnegan  10524150
+
+## Exam Revision
+
+## September 2019
+
+## Question 4 : GLM
+
+## Use dataset available on 'http://users.stat.ufl.edu/~winner/data/biodiesel_transest.csv' , then:
+
+## Read in the NFL dataset
+link='http://users.stat.ufl.edu/~winner/data/biodiesel_transest.csv'
+datasetTrans=read.csv(link)
+nrow(datasetTrans)
+head(datasetTrans)
+tail(datasetTrans)
+str(datasetTrans)
+
+
+## Question 4 (a) Based on the attributes of this dataset, propose an appropriate GLM
+## to model prop1_ec as the target variable to other numerical
+## variables. Express your reason.
+
+
+table(datasetTrans$prop1_ec)
+
+## Propose Linear Regression GLM - the output variable is continous
+
+
+
+## Question 4 (b) Specify the significant input variables on prop1_ec at 
+## the level of 𝛼=0.05, and estimate their corresponding coefficients.
+
+
+fit = glm(prop1_ec~., data = datasetTrans, family="gaussian")
+summary(fit)
+
+## Significant Variables with 𝛼=0.05
+##
+## run_id
+## meth_ec      
+## eth_pct      
+## eth_ec       
+## prop1_pct
+
+
+## Question 4 (c)
+
+set.seed(1781)
+
+
+## Split the dataset in 80/20 ratio
+sample = sample.split(datasetTrans$prop1_ec, SplitRatio=0.80)
+trainset = subset(datasetTrans, sample==TRUE)
+testset = subset(datasetTrans, sample==FALSE)
+
+
+# Display the number of rows in each set after splitting the Transest data
+nrow(datasetTrans) # Original dataset
+nrow(trainset) # Training set
+nrow(testset) # Test set
+dim(trainset)
+
+
+# Get Predictive Model
+
+fit1 = glm(prop1_ec~., data = trainset, family = "gaussian")
+summary(fit1)
+
+
+yhat.pred=predict(fit1,testset)
+yhat.pred
+
+
+## Predictive model
+
+## Phat = yhat = bhat etc..
+
+## Yhat = 0.952(meth_ec)i + 0.017(eth_pct)i + 0.494(eth_ec)i - 0.029(prop1_pct)i
+
+
+rmse=sqrt(sum((yhat.pred-testset$prop1_ec)^2)/nrow(testset)) 
+rmse
