@@ -1,0 +1,68 @@
+## CA Two Advanced Data Analytics : Module Code B8IT109
+## Student Name : Ciaran Finnegan  10524150
+
+## Sample Moodle Exam Revision
+
+## March 2020
+
+## Question 1- Use Boston dataset and consider medv and chas as the attributes of interest. 
+
+
+## Review content and structure of Boston dataset
+
+nrow(Boston)
+head(Boston)
+tail(Boston)
+str(Boston)
+
+attach(Boston)
+
+#consider mpg and vs as the attributes of interest
+table(medv)
+table(chas)
+
+
+## a)	Use the appropriate probability models to quantify the uncertainty of two variables
+
+# medv - continous variable - standard to use a Normal Model
+
+# chas - bimary output, Bernouli Model
+
+
+## b)	Estimate the parameters of your proposed models using the dataset.  
+
+# medv - need to find mu and sigma
+
+# Find mu
+medv.mu = mean(medv)
+medv.mu
+
+# Find sigma
+medv.sigma = sd(medv)
+medv.sigma
+
+
+# chas - need to find p
+chas.p = sum(chas)/length(chas)
+chas.p
+
+
+
+
+
+## c)	Predict the future values of variables.  
+
+# medv - predict future values using the rnorm function.
+medv.preds = rnorm(1000, medv.mu, medv.sigma)
+medv.pred = mean(medv.preds)
+medv.pred
+
+
+# chas - predict future value using rbinom function
+chas.pred = rbinom(1000, 1, chas.p)
+table(chas.pred)
+
+# '0' prediction - use seed in exam
+
+
+

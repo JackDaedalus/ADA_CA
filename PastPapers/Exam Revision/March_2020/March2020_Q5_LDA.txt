@@ -1,0 +1,127 @@
+## CA Two Advanced Data Analytics : Module Code B8IT109
+## Student Name : Ciaran Finnegan  10524150
+
+## Exam Revision
+
+## March 2020
+
+## Question 5 : Use dataset available on http://users.stat.ufl.edu/~winner/data/hybrid_reg.csv - LDA, K-Means, Correlation
+
+## Load dataset and examine
+
+## Review content and structure of Hybrid dataset
+
+link='http://users.stat.ufl.edu/~winner/data/hybrid_reg.csv'
+datasetHyb=read.csv(link)
+nrow(datasetHyb)
+head(datasetHyb)
+tail(datasetHyb)
+str(datasetHyb)
+
+
+
+
+
+## a) Use LDA to classify the dataset into few classes so that 
+## at least 85% of information of dataset is explained through new classification. 
+## (Hint: model the output variable “carclass_id” to input variables “msrp”, 
+## “accelrate”, and “mpg”). How many LDs do you choose? Explain the reason.
+
+
+hyb.lda = lda(carclass_id~msrp+accelrate+mpg, data = datasetHyb)
+hyb.lda
+
+
+## LD1 and LD2 - model approx 90%
+
+
+
+## (b) Apply PCA to input variables, and identify the important principle components 
+## involving at least 90% of dataset variation. Explain your decision strategy? 
+## Plot principle components versus their variance (Hint: to sketch the plot use the Scree plot).
+datasetHyb2 = datasetHyb[4:6]
+head(datasetHyb2)
+
+hyb.pca = princomp(datasetHyb2, cor = TRUE)
+summary(hyb.pca)
+
+
+## Need all three pinciple components
+loadings(hyb.pca)
+plot(hyb.pca, type = 'lines')
+
+
+
+## (c) Use K-means clustering analysis to input variables and identify 
+## the most important classes. How many classes do you select? Why?
+
+
+# Generate the plot K-Means clustering
+## Write function for plot generation
+wssplot <- function(datasetHyb2, nc=10, seed=2343){
+  
+  wss <- (nrow(datasetHyb2)-1) * sum(apply(datasetHyb2, 2, var))
+  
+  for (i in 2 : nc){
+    
+    set.seed(seed)
+    wss[i] <- sum(kmeans(datasetHyb2, centers = i)$withinss)
+    
+  }
+  
+  plot(1:nc, wss, type = "b", xlab = "Numbers of Clusters", ylab = "Within Groups Sum of Squares")
+  
+  
+}
+
+
+wssplot(datasetHyb2, 10)  # Start with 10 classes
+
+wssplot(datasetHyb2, 3)  # 3 Classes is best
+
+hyb.kmeans = kmeans(datasetHyb2, 3)
+attributes(hyb.kmeans)
+
+
+# Centroids
+hyb.kmeans$centers
+
+# Cluster Size
+hyb.kmeans$size
+
+
+
+
+
+
+## (d) Split the dataset into two sets of variables so that 
+## X=( msrp, mpgmpge) and Y=( accelrate, mpg). 
+## Apply canonical correlation analysis to find the 
+## cross-correlation between X and Y. What is the correlation 
+## between msrp and mpg?
+
+
+X <- cbind(datasetHyb$msrp, datasetHyb$mpgmpge) 
+head(X)
+
+X1 <- data.frame(datasetHyb$msrp, datasetHyb$mpgmpge)
+head(X1)
+
+
+Y <- cbind(datasetHyb$accelrate, datasetHyb$mpg) 
+head(Y)
+
+Y1 <- data.frame(datasetHyb$accelrate, datasetHyb$mpg)
+head(Y1)
+
+
+hyb.cor = cor(X,Y)
+hyb.cor
+
+
+hyb.cor1 = cor(X1,Y1)
+hyb.cor1
+
+
+## -0.5318264
+

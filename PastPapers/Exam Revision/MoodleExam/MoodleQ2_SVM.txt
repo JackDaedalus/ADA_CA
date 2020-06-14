@@ -1,0 +1,113 @@
+## CA Two Advanced Data Analytics : Module Code B8IT109
+## Student Name : Ciaran Finnegan  10524150
+
+## Sample Moodle Exam Revision
+
+## March 2020
+
+## Question 2 - Use Boston dataset and consider chas as ouput variable 
+## and rm, age, dis, rad, as the input variables
+
+library(e1071) 
+
+## Review content and structure of Boston dataset
+
+nrow(Boston)
+head(Boston)
+tail(Boston)
+str(Boston)
+
+nrow(Boston)
+df = Boston
+dataset=na.omit(df)
+nrow(dataset)
+
+dataset$chas <- as.factor(dataset$chas)
+
+#consider mpg and vs as the attributes of interest
+table(dataset$chas)
+
+
+######################################
+## a)	Split the dataset into 80% as the train-set and 20% 
+## as the test-set. (use set.seed(1004))
+
+set.seed(1004)
+
+## Split the dataset in 80/20 ratio
+sample = sample.split(dataset$chas, SplitRatio=0.80)
+trainset = subset(dataset, sample==TRUE)
+testset = subset(dataset, sample==FALSE)
+
+# Display the number of rows in each set after splitting the Boston data
+nrow(dataset) # Original dataset
+nrow(trainset) # Training set
+nrow(testset) # Test set
+dim(trainset)
+
+
+
+######################################
+## b) b)	Apply SVM algorithm to train the classifier 
+## using train-set with kernel ‘poly’.                                                      
+fit.svm <- svm(chas~rm+age+dis+rad, data = trainset, type='C-classification', kernel = 'poly') #type='C-classification',
+fit.svm
+
+
+######################################
+## c)	Predict the test-set using the trained 
+## model of classifier.  
+
+pred.svm = predict(fit.svm, testset)
+pred.svm
+
+
+######################################
+## d)	Provide the confusion matrix 
+## and obtain the accuracy.    
+
+# Confusion Matrix
+tab = table(pred.svm, testset$chas)
+tab
+
+# Accuracy
+accuracy=sum(tab[row(tab)==col(tab)])/sum(tab)
+accuracy
+
+
+
+
+
+#chas~rm+age+dis+rad
+
+dataset2 = data.frame(dataset[6:9], dataset[4])
+head(dataset2)
+
+## Split the dataset in 80/20 ratio
+##sample2 = sample.split(dataset2$chas, SplitRatio=0.80)
+##trainset2 = subset(dataset2, sample==TRUE)
+##testset2 = subset(dataset2, sample==FALSE)
+
+n=nrow(dataset2) 
+indexes = sample(n,n*(80/100)) 
+trainset2 = dataset2[indexes,] 
+testset2 = dataset2[-indexes,] 
+
+str(trainset2)
+str(testset2)
+
+
+## Naive Bayes
+fit.nb <- naiveBayes(trainset2$chas~., data = trainset2)
+pred.nb = predict(fit.nb, testset2$chas)
+tab.nb = table(pred.nb, testset$chas)
+accuracy.nb = sum(tab.nb[row(tab.nb)==col(tab.nb)])/sum(tab.nb)
+accuracy.nb
+
+
+## Decision Tree
+fit.dt <- ctree(trainset2$chas~., data = trainset2)
+pred.dt = predict(fit.dt, testset2$chas)
+tab.dt = table(pred.dt, testset2$chas)
+accuracy.dt = sum(tab.dt[row(tab.dt)==col(tab.dt)])/sum(tab.dt)
+accuracy.dt

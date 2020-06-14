@@ -1,0 +1,179 @@
+## CA Two Advanced Data Analytics : Module Code B8IT109
+## Student Name : Ciaran Finnegan
+
+## Student Number : 10524150
+
+## June 2020
+
+
+## Question Two
+
+## Use dataset available on http://users.stat.ufl.edu/~winner/data/nfl2008_fga.csv 
+## (a) Train the model using 80% of this dataset and suggest an appropriate GLM to model homekick to togo, ydline and kicker variables.
+
+
+library(caTools) # useful to split data to training and test datasets
+library(MASS)
+
+#############################################################
+## Read in the NFL dataset
+link='http://users.stat.ufl.edu/~winner/data/nfl2008_fga.csv'
+datasetNFL=read.csv(link)
+## Present head and tail and structure of NFL dataset
+head(datasetNFL)
+tail(datasetNFL)
+str(datasetNFL)
+#############################################################
+
+
+#####################################################################################
+## Q.2 (Part a)
+## Train the model using 80% of this dataset and suggest an appropriate GLM to model 
+## homekick to togo, ydline and kicker variables.
+
+
+## Minor Clean up of NFL dataset
+sum(is.na(datasetNFL)) # Check how many rows have missing values
+datasetNFL <- na.omit(datasetNFL) # Clean the rows with missing values
+sum(is.na(datasetNFL)) # Check the missing values are removed
+## For this NFL dataset four rows with missing date were found and removed
+
+#
+## Display the values for 'homekick' as this is the variable which the question wants 
+## to model against togo, ydline and kicker variables.
+table(datasetNFL$homekick)
+## I can see the range of binary values in the 'homekick' attribute in the NFL dataset 
+
+## The output variable is 'homekick'. As this is a binary outcome (0,1) the best GLM 
+## is therefore Logistic Regression.
+
+## The togo, ydline and kicker attributes in the NFK dataset are the input variables 
+## in this question.
+
+
+## For this section of the question use 'set.seed()' to ensure consistency of results
+set.seed(42)  # The purpose of this is to ensure consistency in the initial prediction
+
+#
+## Split NFL dataset in 80/20 ratio
+sample = sample.split(datasetNFL$homekick, SplitRatio=0.80)
+trainsetNFL = subset(datasetNFL, sample==TRUE)
+testsetNFL = subset(datasetNFL, sample==FALSE)
+
+#
+# Display the number of rows in each set after splitting the NFL data
+nrow(datasetNFL) # Original dataset
+nrow(trainsetNFL) # Training set
+nrow(testsetNFL) # Test set
+
+#
+## Model the trainset by fitting the Logistic Regression GLM - the input (independent) 
+## variables are used as required by the question
+## The 'family' variable is set to 'binomial' because as we are using Logistic Regression
+fit=glm(homekick~togo+ydline+kicker, data=trainsetNFL, family='binomial') 
+summary(fit) 
+
+
+
+#####################################################################################
+## Q.2 (Part b)
+## Specify the significant variables on homekick at the level of 𝛼=0.05, and estimate
+## the parameters of your model.
+
+#
+## Re-display the outcome 
+summary(fit) 
+
+## The significant variables at the level of α=0.05 are; 
+## (I used a 'seed' setting of '42' to ensure consistent results)
+##
+## 'togo'
+## 'ydline'
+
+## togo and ydline variables have a 'P' value less than 0.05 (0.0113 and 0.0401 respectively).
+## kicker has a 'P' value of 0.9345, hence greater than 0.05
+## The 'Intercept' also has a value greater than α=0.05 and is thus also not a significant 
+## parameter for the model.
+
+
+# The estimated parameters for the significant variables are; (rounded slightly)
+#
+# togo        : -0.0447
+# ydline      :  0.0156
+
+#
+## Photo image of Predictive Model provided here :
+
+
+
+
+
+#
+#####################################################################################
+## Q.2 (Part c)
+## Predict the test dataset using the trained model.
+
+## The solution could re-train the model with just togo and ydline input variables
+## but it was found that this did not improve accuracy.
+
+
+#############################################
+## This was discussed in the lecture on Friday 29th May as a means to reduce the model 
+## to only significant attributes.
+##
+#lr_red = stepAIC(fit)
+#summary(lr_red)
+#pred_red=predict(lr_red, testsetNFL)
+#predres=predict(lr_red, testsetNFL, type='response') 
+
+# I also ran a test to see if re-training the model with just the input variables 
+# mentioned in the question would improve accuracy, but it did not.
+
+#datasetRed = data.frame(datasetNFL$togo, datasetNFL$ydline, datasetNFL$kicker, datasetNFL$homekick)
+#sample = sample.split(datasetRed$datasetNFL.homekick, SplitRatio=0.80)
+#trainsetRed = subset(datasetRed, sample==TRUE)
+#testsetRed = subset(datasetRed, sample==FALSE)
+#fit.Red = glm(datasetNFL.homekick~., data=trainsetRed, family='binomial') 
+#predres=predict(fit.Red, testsetRed, type='response') 
+#testsetNFL <- testsetRed
+#############################################
+
+
+
+## Use the trained model to predict the results from the NFL test set
+predres=predict(fit, testsetNFL, type='response') 
+## Display the predictions using the test set
+predres
+
+
+
+#####################################################################################
+## Q.2 (Part d)
+## Provide the confusion matrix and obtain the probability of correctness of predictions.
+
+## Review the layout of the head of the testset of the NFL dataset
+head(testsetNFL)
+
+## Convert phat to yhat  
+## Set up so that predicted results from the model are compared against the actual values
+## in the testset data. It is necessary to change the values to represent the binary outcome
+predictedvalues=rep(0,nrow(testsetNFL)) 
+## Assess the number of matching 'homekick' values in the testset against the output of the model
+predictedvalues[predres>=0.5]=1   # Probability of 'homekick' being 1, if p<0.5 then 'homekick'=0 
+
+## Compare the values predicted for the testset against the actual values for 'homekick' 
+tab = table(predictedvalues, testsetNFL$homekick)
+
+## Show a Confusion Matrix to represent the accuracy of the results
+tab
+## Calculate the accuracy as a percentage value
+## This is a sum of the TP (True Pos) + TN (True Neg) / All Results
+accuracy=sum(tab[row(tab)==col(tab)])/sum(tab)
+#
+accuracy
+#
+## Using the given seed of '42' the calculation is (59+49)/(59+49+46+53) = 52% (with rounding)
+## These values are the ones provided by the Confusion Matrix above.
+## Accuracy is poor.
+
+

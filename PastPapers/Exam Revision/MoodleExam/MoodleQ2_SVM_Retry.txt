@@ -1,0 +1,134 @@
+## CA Two Advanced Data Analytics : Module Code B8IT109
+## Student Name : Ciaran Finnegan  10524150
+
+## Sample Moodle Exam Revision - Retry
+
+
+dataset = Boston
+
+head(dataset)
+str(dataset)
+
+
+## a) 80/20
+
+## a)	Split the dataset into 80% as the train-set and 20% 
+## as the test-set. (use set.seed(1004))
+
+set.seed(1004)
+
+## Split the dataset in 80/20 ratio
+#sample = sample.split(dataset$chas, SplitRatio=0.80)
+#sample = sample.split(dataset, SplitRatio=0.80)
+#trainset = subset(dataset, sample==TRUE)
+#testset = subset(dataset, sample==FALSE)
+
+
+
+n=nrow(dataset) 
+indexes = sample(n,n*(80/100)) 
+trainset = dataset[indexes,] 
+testset = dataset[-indexes,] 
+
+
+
+nrow(dataset)
+nrow(trainset)
+nrow(testset)
+
+
+## b) SVM
+
+ds.svm <- svm(chas~rm+age+dis+rad, trainset, type='C-classification', kernel = 'poly')
+ds.svm
+
+## c) predict
+
+pred.svm <- predict(ds.svm, testset)
+pred.svm
+
+## d) Confusion Matrix
+
+tab.svm = table(pred.svm, testset$chas, dnn=c("Prediction","Actual"))
+tab.svm
+accuracy.svm = sum(tab.svm[row(tab.svm)==col(tab.svm)])/sum(tab.svm)
+accuracy.svm
+
+
+
+dataset2 = data.frame(dataset[6:9], dataset[4])
+
+n=nrow(dataset2) 
+indexes = sample(n,n*(80/100)) 
+trainset2 = dataset[indexes,] 
+testset2 = dataset[-indexes,] 
+
+
+nrow(dataset2)
+nrow(trainset2)
+nrow(testset2)
+
+
+## NB
+ds.nb <- naiveBayes(trainset2$chas~.,trainset2)
+ds.nb
+
+pred.nb = predict(ds.nb, testset2, type = "class")
+pred.nb
+
+tab.nb = table(pred.nb, testset2$chas)
+tab.nb
+accuracy.nb = sum(tab.nb[row(tab.nb)==col(tab.nb)])/sum(tab.nb)
+
+
+
+
+
+## DT
+ds.dt <- rpart(trainset2$chas~., method="class", trainset2)
+summary(ds.dt)
+pred.dt = predict(ds.dt, testset2)
+tab.dt = table(pred.dt, testset2$chas, dnn=c("Prediction","Actual"))
+accuracy.dt = sum(tab.dt[row(tab.dt)==col(tab.dt)])/sum(tab.dt)
+
+
+
+ds.ct <- ctree(chas~rm+age+dis+rad, trainset2)
+summary(ds.ct)
+pred.ct = predict(ds.ct, testset2, type = "response")
+
+predictedvalues=rep(0,nrow(testset2)) 
+predictedvalues[pred.ct>0.5]=1   # probability of Gender being 1, if p<0.5 then gender=0 
+accuracy.ct=mean(predictedvalues==testset2[,4]) 
+
+
+tab.ct = table(pred.ct, testset2$chas, dnn=c("Prediction","Actual"))
+accuracy.ct = sum(tab.ct[row(tab.ct)==col(tab.ct)])/sum(tab.ct)
+
+
+
+
+
+
+tab.svm
+accuracy.svm
+
+tab.ct
+accuracy.ct
+
+
+tab.nb
+accuracy.nb
+tab.dt
+accuracy.dt
+
+
+
+
+
+
+
+
+
+
+

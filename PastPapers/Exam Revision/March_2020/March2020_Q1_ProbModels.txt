@@ -1,0 +1,80 @@
+## CA Two Advanced Data Analytics : Module Code B8IT109
+## Student Name : Ciaran Finnegan  10524150
+
+## Exam Revision
+
+## March 2020
+
+## Question 1 : Probability Models
+
+## Use mtcars dataset and consider mpg and vs as the attributes of interest.
+
+## Review content and structure of mtcars dataset
+
+nrow(mtcars)
+head(mtcars)
+tail(mtcars)
+str(mtcars)
+
+attach(mtcars)
+
+#consider mpg and vs as the attributes of interest
+table(mpg)
+table(vs)
+
+###################################################
+## a) Use the appropriate probability models to quantify the uncertainty in mpg and vs.
+
+# mpg - This is a continous variable - hence use the Normal model
+
+# vs - This is a binary output of '0' and '1' - hence use the Bernouli Model
+
+
+
+
+###################################################
+## b) Estimate the parameters of your proposed models using the dataset.
+
+# mpg - parameters are mu and sigma
+# model x using N(mu, sigma), mu and sigma are parameters 
+# mpg - mu : mean 
+mpg.mu = mean(mpg)
+mpg.mu
+
+# mpg - sigma : standard deviation
+mpg.sigma = sd(mpg)
+mpg.sigma
+
+
+
+# vs - parameters are sum of '1' values over row count
+y <- vs
+vs.p = sum(y)/length(y)
+vs.p
+
+
+
+###################################################
+## c) Predict the future values of mpg and vs using (a) and (b).
+
+# mpg - predict using rnorm formula
+mpg.preds = rnorm(1000, mpg.mu, mpg.sigma)
+mpg.pred = mean(mpg.preds)
+mpg.pred
+
+
+# vs - predict using bnorm formula
+vs.preds = rbinom(1000, 1, vs.p)
+table(vs.preds)
+
+
+
+
+###################################################
+## d) Using (a), (b), find P(mpg > 90).
+# P(X>90) = 1 - P(X<=90) = 1 - pnorm(90, mu, sigma)
+# mpg - use pnorm formula
+mpg.prob = 1 - pnorm(90, mpg.mu, mpg.sigma)
+mpg.prob
+
+

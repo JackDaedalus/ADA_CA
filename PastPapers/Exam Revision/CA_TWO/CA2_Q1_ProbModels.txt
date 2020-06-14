@@ -1,0 +1,278 @@
+## CA Two Advanced Data Analytics : Module Code B8IT109
+## Student Name : Ciaran Finnegan
+
+## Student Number : 10524150
+
+## June 2020
+
+
+## Question One
+
+
+## Library Calls
+library(DT)
+library(ggplot2)
+library(reshape2)
+library(dplyr)
+
+## References used.
+## http://www.datasciencemadesimple.com/melting-casting-r/
+## http://www.datasciencemadesimple.com/drop-variables-columns-r-using-dplyr/
+
+
+
+########################################################
+## Use in-built dataset ‘airquality’
+########################################################
+
+## Read in airquality dataset
+aq <- data.frame(airquality)
+
+
+####################################################################################################
+
+# Below are a set of R functions to perform relatively straightforward actions to generate central 
+# and variational measures.
+
+# I am re-using functions I wrote for the CA One solutions.
+
+
+# Calculate mean of attribute list - pass an attribute list from air quality dataset
+dataset.attr.mean <- function(y) {
+  
+  return(mean(y))
+  
+}
+
+# Calculate Median of attribute list - pass an attribute list from air quality dataset
+dataset.attr.median <- function(y) {
+  
+  return(median(y))
+  
+}
+
+# Calculate Mode of attribute list - pass an attribute list from air quality dataset
+# Start by creating a decicated 'Mode' function - as shown in lectures
+dataset.attr.mode <- function(v) {
+  
+  uniqv <- unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
+  
+}
+
+
+# Calculate range of values of an attribute list - pass an attribute list from air quality dataset
+dataset.attr.range <- function(v) {
+  
+  # Range of values in <> attribute
+  rDPF = range(v)
+  RangeDPF = rDPF[2] - rDPF[1]
+  RangeDPF
+  
+}
+
+# Calculate variance of values of an attribute list - pass an attribute list from air quality dataset
+dataset.attr.var <- function(v) {
+  
+  V=var(v)
+  
+}
+
+# Calculate standard deviation of values of an attribute list - pass an attribute list from air quality dataset
+dataset.attr.stddev <- function(v) {
+  
+  s=sd(v)
+  
+}
+
+####################################################################################################
+
+
+
+
+#################################################################################
+## Q.1 (Part a)
+## Explore the general feature of dataset using appropriate R functions.(5 Marks)
+
+
+# Display number of rows in airquality dataset
+nrow(aq)
+
+# Display first and last five rows of airquality dataset
+head(aq)
+tail(aq)
+
+## Display table view of records - opens in the 'viewer' and can be exported as a web page
+DT::datatable(aq, options = list(lengthMenu = c(5, 30, 50), pageLength = 5))
+
+
+## Display summary statistics for the variables in the airquality dataset
+summary(aq)
+## Display structure of the airquality dataset
+str(aq)
+
+
+## -------------------------------------------------------------------
+## Generate total Histogram view of airquality dataset. 
+## -------------------------------------------------------------------
+## However, remove the 'month' and 'day' colums from this visualisation 
+## as they will distort the scale of the output. 
+## Their values are obvious to understand ; 
+## 'month' is just the number of days in each month in the dataset
+## 'day' is the day of the particular month
+
+
+## Read in a copy of the full air quality dataset to another dataset 
+## variable to be used to generate the histogram
+airqHist <- aq 
+
+## Drop the 'Month' and 'Day' columns as they add no value to this
+## histogram view and distort the scales of the visualisations
+airqHist = select(airqHist, -c(Month, Day))
+
+## Reshape the data to fit into a single histogram
+d <- melt(airqHist)
+
+## Generate Histogram visualisation for the airquality dataset
+ggplot(d,aes(x = value, fill=variable)) + 
+  facet_wrap(~variable,scales = "free_x", nrow=2,ncol=2) + 
+  geom_histogram(position="identity", bins=20)
+
+## The histogram generates a warning message about 44 rows in the dataset
+## with missing entries, which are ignored in the graph.
+## I will address these data issues in the next section of this solution to 
+## Question 1 of ADA CA Two.
+
+
+
+
+#################################################################################
+## Q.1 (Part b)
+## Perform data cleansing if required. (5 Marks)
+
+
+## Some entries are missing - generate a count by colum to focus in these values 
+## as shown at the end of the output from the 'summary' function.
+
+## Other options exist to deal with missing entries but. for simplicity, I have
+## chosen to just delete these rows from the dataset.
+
+## Show initial row before data clean up
+nrow(aq)
+## Show where missing entries are in the dataset
+colSums(is.na(aq))
+## Remove the rows with missing data
+aqClean <- na.omit(aq)
+## Check row count after rows with missing data removed.
+nrow(aqClean)
+
+
+
+## 'Month' and 'Day' are showing as numeric values. These should be adjusted
+## to categorical. We use a 'factor' function to alter this in the cleaned 
+## dataset.
+aqClean$Month = factor(aqClean$Month)
+aqClean$Day = factor(aqClean$Day)
+head(aqClean)
+summary(aqClean)
+
+
+
+
+
+
+
+
+
+
+#################################################################################
+## Q.1 (Part c)
+## Consider ‘Temp’ attributes and compute the central and variational measures. (10 Marks)
+
+
+#################################################################################
+# Central Measures - mean, median, amd mode
+#################################################################################
+
+# Return Mean of 'Temp' attribute value
+attrMean = dataset.attr.mean(aqClean$Temp)
+attrMean
+
+# Return Median of 'Temp' attribute value
+attrMedian = dataset.attr.median(aqClean$Temp)
+attrMedian
+
+# Return Mode of 'Temp' attribute value
+attrMode = dataset.attr.mode(aqClean$Temp)
+attrMode
+  
+
+#################################################################################
+# Variational Measures : Range/variance/standard deviation
+#################################################################################
+
+# Return Range of 'Temp' attribute values
+attrRange = dataset.attr.range(aqClean$Temp)
+attrRange
+
+# Return variance
+attrVar = dataset.attr.var(aqClean$Temp)
+attrVar
+
+# Return standard deviation
+attrSD = dataset.attr.stddev(aqClean$Temp)
+attrSD
+
+
+
+
+
+#################################################################################
+## Q.1 (Part d)
+## Apply box plot technique to detect outlier of ‘wind’ attribute if any.
+
+
+## Taking the entire air quality data set into account we can see that there 
+## three outliers when we represent the 'wind' attribute values through the
+## BoxPlot technique. 
+
+## These outlier values are represented as red stars in the BoxPlot 
+
+ggplot(aqClean, aes(y = aqClean$Wind)) +
+  geom_boxplot(outlier.colour="red", outlier.shape=8,
+               outlier.size=4) +
+  ylab("WIND") +
+  theme(axis.title.x = element_text(color = "blue", size = 14, face = "bold"),
+        axis.text.x = element_blank(),
+        axis.ticks.y = element_blank()) +
+  scale_y_continuous(limits=c(1,23), breaks=seq(0,23,1))
+
+
+
+
+## Breaking down the wind measurements by month we can see the following
+## range of data across the time frame for the air quality dataset
+
+## Two outlier values appear in the 5th month, and one appears in the 6th
+
+ggplot(aqClean, aes(x = Month, y = aqClean$Wind, col = Month, fill = Month)) +
+  geom_boxplot(alpha = 0.2, 
+               outlier.shape=4,
+               outlier.size=6) +  
+  ylab("WIND") +
+  scale_color_manual(values = c("red", "black", "green", "orange", "blue")) +
+  scale_fill_manual(values = c("red", "black", "green", "orange", "blue"))
+
+
+
+
+
+
+
+
+
+
+
+
+
+

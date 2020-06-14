@@ -1,0 +1,115 @@
+## CA Two Advanced Data Analytics : Module Code B8IT109
+## Student Name : Ciaran Finnegan  10524150
+
+## Exam Revision
+
+## March 2020
+
+## Question 3 : Loading the package ‘datasets’, use the dataset 
+## ‘readingSkills’ and consider nativeSpeaker as the output variable.
+
+
+library('party')
+
+df = readingSkills
+
+nrow(df)
+head(df)
+tail(df)
+str(df)
+
+
+## Minor Clean up of dataset
+sum(is.na(df)) # Check how many rows have missing values
+df <- na.omit(df) # Clean the rows with missing values
+sum(is.na(df)) # Check the missing values are removed
+
+
+
+
+############################################
+## Part a) Split the dataset into 80% as the 
+## train-set and 20% as the test-set. 
+## (use set.seed(104)) 
+
+set.seed(104)
+
+## Split the dataset in 80/20 ratio
+sample = sample.split(df$nativeSpeaker, SplitRatio=0.80)
+trainset = subset(df, sample==TRUE)
+testset = subset(df, sample==FALSE)
+
+nrow(df)
+nrow(trainset)
+nrow(testset)
+dim(trainset)
+
+
+############################################
+## Part b) Apply Random Forest (RF) algorithm 
+## to train the classifier using train-set 
+## with 20 trees.
+
+fit.rf = randomForest(nativeSpeaker~., data = trainset, ntree = 20)
+fit.rf
+plot(fit.rf)
+
+
+
+############################################
+## Part c) Predict the test-set using the 
+## trained model of classifier.
+
+pred.rf = predict(fit.rf, testset)
+pred.rf
+
+
+
+############################################
+## Part d) Provide the confusion matrix and 
+## obtain the accuracy.
+
+tab.rf = table(pred.rf, testset$nativeSpeaker)
+tab.rf
+
+accuracy.rf = sum(tab.rf[row(tab.rf)==col(tab.rf)])/sum(tab.rf)
+accuracy.rf
+
+
+
+############################################
+## Part e) Redo parts b-d to apply either 
+## Naïve Bayes or Decision Tree. Which model 
+## does provide the higher accuracy?
+
+
+# Naive Bayes
+fit.nb = naiveBayes(nativeSpeaker~., data = trainset)
+pred.nb = predict(fit.nb, testset)
+tab.nb = table(pred.nb, testset$nativeSpeaker)
+accuracy.nb = sum(tab.nb[row(tab.nb)==col(tab.nb)])/sum(tab.nb)
+accuracy.nb
+
+
+# Decision Trees
+fit.dt = rpart(nativeSpeaker~., data = trainset, method = "class", control = rpart.control(cp = 0)) 
+pred.dt = predict(fit.dt, testset, type='class') # prediction 
+accuracy.dt = mean(pred.dt == testset$nativeSpeaker)
+accuracy.dt
+
+
+fit.ct = ctree(nativeSpeaker~., data = trainset)
+pred.ct = predict(fit.ct, testset)
+accuracy.ct = mean(pred.ct == testset$nativeSpeaker)
+accuracy.ct
+
+
+acc = c(accuracy.rf, accuracy.nb, accuracy.dt, accuracy.ct)
+acc
+
+
+
+
+
+
+

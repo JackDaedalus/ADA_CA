@@ -1,0 +1,83 @@
+## CA Two Advanced Data Analytics : Module Code B8IT109
+## Student Name : Ciaran Finnegan  10524150
+
+## Exam Revision
+
+## March 2020
+
+## Question 2 : GLM
+
+## lm(formula = medv ~ crim + zn + indus + chas + nox + rm, data = Boston)
+
+
+###################################################
+## a) Using this output, specify the response and independent variables.
+
+## Response variable = medv
+## Independent variables = crim + zn + indus + chas + nox + rm
+
+
+
+###################################################
+## b) Based on the output, which type of GLM is proposed for this analysis.
+
+## Review content and structure of Boston dataset
+
+nrow(Boston)
+head(Boston)
+tail(Boston)
+str(Boston)
+
+attach(Boston)
+
+#consider mpg and vs as the attributes of interest
+table(medv)
+
+
+# The ouput medv is a continous variable, we use mutliple linear regression for GLM.
+
+
+
+
+###################################################
+## c) List the assumptions for your proposed regression model.
+
+## Assumptions?
+
+## The error terms (i.e. ϵ_i = y_i - ŷ_i) needs to be Normally distributed,
+## with the mean zero and constant variance. Also,  ϵ_i  and ϵ_j are independent. 
+
+
+
+###################################################
+## d) Specify the significant independent variables on the 
+## response variable at the level of 𝛼 = 0.05.
+
+## Independent variables where p < 𝛼
+
+## Intercept
+## crim
+## indus
+## chas
+## rm
+
+
+#######################################
+# e) Using the output, find the optimal predictive model for 
+## the response variable.
+
+## ŷ_i =  that_i= -17.955 -0.177(crim)(i) -0.144(indus)(i) + 4.785(chas)(i) + 7.342(rm)(i)
+
+
+
+
+
+
+
+
+
+
+
+
+
+

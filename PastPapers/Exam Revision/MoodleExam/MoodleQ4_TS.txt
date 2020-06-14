@@ -1,0 +1,58 @@
+## CA Two Advanced Data Analytics : Module Code B8IT109
+## Student Name : Ciaran Finnegan  10524150
+
+## Exam Revision
+
+## Moodle Sample
+
+## Question 4 
+
+ds = Boston$medv
+ds
+
+
+# a/ Vizualisation
+
+medv.ts = ts(ds)
+plot(medv.ts)
+
+qqnorm(medv.ts)
+
+medv.ts.diff = diff(medv.ts)
+plot(medv.ts.diff)
+
+medv.ts.difflog = diff(log(medv.ts))
+plot(medv.ts.difflog)
+
+
+#B/ find optimised ARIMA
+
+acf(medv.ts.difflog)  # q = 3
+
+pacf(medv.ts.difflog)  # p = 3
+
+
+manual.fit = arima(medv.ts, c(3,1,3))
+manual.fit
+
+
+auto.fit = auto.arima(medv.ts, seasonal = F)
+auto.fit
+
+
+auto.fit = auto.arima(medv.ts, seasonal = T)
+auto.fit
+
+
+
+# C/ MA = q = 3, AR = p = 3
+
+
+# D/ Forecast
+
+manual.forecast = forecast(manual.fit, h=10)
+plot(manual.forecast)
+
+
+
+

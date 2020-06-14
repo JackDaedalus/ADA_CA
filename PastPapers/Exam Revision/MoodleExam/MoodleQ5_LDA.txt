@@ -1,0 +1,96 @@
+## CA Two Advanced Data Analytics : Module Code B8IT109
+## Student Name : Ciaran Finnegan  10524150
+
+## Exam Revision
+
+## Moodle Sample
+
+## Question 5 : LDA, PCA, K-Means, Correlation
+
+dataBsn = Boston
+nrow(dataBsn)
+head(dataBsn)
+tail(dataBsn)
+str(dataBsn)
+
+## Minor Clean up of dataset
+sum(is.na(dataBsn)) # Check how many rows have missing values
+data <- na.omit(dataBsn) # Clean the rows with missing values
+sum(is.na(dataBsn)) # Check the missing values are removed
+
+
+
+## a)	Use LDA to classify the dataset into few classes so that at 
+## least 85% of information of dataset is explained through new classification. 
+## (Hint: consider the rad as the output variable,  
+## and tax ptratio  black lstat medv as input variables. ) 
+## How many LDs do you choose? Explain the reason.     
+
+dataBsn.lda <- lda(rad~tax+ptratio+black+lstat+medv, data = dataBsn)
+dataBsn.lda
+
+
+# Just LD1 for 85%
+
+# b PCA - 90%
+# Input variables 
+
+datasetBoston = dataBsn[10:14]
+tail(datasetBoston)
+
+dsBsn.pca <- princomp(datasetBoston, cor = TRUE)
+summary(dsBsn.pca)
+
+
+# Up to Comp 4
+loadings(dsBsn.pca)
+plot(dsBsn.pca, type = 'lines')
+
+
+# c K-Means
+
+# Generate the plot K-Means clustering
+## Write function for plot generation
+wssplot <- function(datasetBoston, nc=10, seed=2343){
+  
+  wss <- (nrow(datasetBoston)-1) * sum(apply(datasetBoston, 2, var))
+  
+  for (i in 2 : nc){
+    
+    set.seed(seed)
+    wss[i] <- sum(kmeans(datasetBoston, centers = i)$withinss)
+    
+  }
+  
+  plot(1:nc, wss, type = "b", xlab = "Numbers of Clusters", ylab = "Within Groups Sum of Squares")
+  
+  
+}
+ 
+
+wssplot(datasetBoston, 10)  # Start with 10
+
+wssplot(datasetBoston, 3)  # go with 3 - maybe 2
+
+
+
+## d Correlation
+
+X1 = data.frame(dataBsn$zn, dataBsn$indus, dataBsn$chas, dataBsn$nox)
+head(X1)
+
+Y1 = data.frame(dataBsn$dis, dataBsn$rad, dataBsn$tax)
+head(Y1)
+
+data.cor1 = cor(X1, Y1)
+
+X = cbind(dataBsn$zn, dataBsn$indus, dataBsn$chas, dataBsn$nox)
+Y = cbind(dataBsn$dis, dataBsn$rad, dataBsn$tax)
+data.cor = cor(X, Y)
+
+data.cor
+data.cor1
+
+## indus and taz - 0.72076018
+
+

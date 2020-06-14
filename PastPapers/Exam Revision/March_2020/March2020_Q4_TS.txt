@@ -1,0 +1,83 @@
+## CA Two Advanced Data Analytics : Module Code B8IT109
+## Student Name : Ciaran Finnegan  10524150
+
+## Exam Revision
+
+## March 2020
+
+## Question 4 : Use data('EuStockMarkets') to load the in-built 
+## dataset 'EuStockMarkets' in R, consider DAX as your time series variable:
+
+df = data.frame(EuStockMarkets)
+
+
+
+## (a) Validate the assumptions using graphical visualization.
+
+
+t <- df$DAX
+tsDax <- ts(t)
+plot(tsDax)
+
+
+abline(reg=lm(df$DAX~time(df$DAX)), col="blue") # line for the mean of time series
+qqnorm(df$DAX)
+
+
+
+tsDaxDiff = diff(tsDax)
+plot(tsDaxDiff)
+
+
+tsDaxLogDiff = diff(log(tsDax))
+plot(tsDaxLogDiff)
+
+
+ggqqplot(tsDax)
+
+
+
+
+##(b) Fit the optimized ARIMA model for DAX and provide the coefficient estimates for the fitted model.
+
+#p,d,q
+
+acf(tsDaxLogDiff)  # gives us q = 1
+
+
+pacf(tsDaxLogDiff) # gives us p = 0
+
+fit.manual = arima(tsDax, c(0,1,1))
+fit.manual
+
+fit.auto = auto.arima(tsDax, seasonal = F)
+fit.auto
+
+fit.auto = auto.arima(tsDax, seasonal = T)
+fit.auto
+
+
+# Manual fit is better
+
+
+
+
+## (c) What is the estimated order for AR and MA?
+
+# MA = q = 1
+# AR = p = 0
+
+
+
+
+
+## (d) Forecast h=10 step ahead prediction of DAX 
+## on the plot of the original time series.
+
+arima.forecast = forecast(fit.manual, h = 10)
+summary(arima.forecast)
+plot(arima.forecast)
+
+
+
+

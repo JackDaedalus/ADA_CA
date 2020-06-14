@@ -1,0 +1,226 @@
+## CA Two Advanced Data Analytics : Module Code B8IT109
+## Student Name : Ciaran Finnegan
+
+## Student Number : 10524150
+
+## June 2020
+
+
+## Question Four - LDA, PCA, K-Means, Canonical Correlation
+
+## Use dataset available on http://users.stat.ufl.edu/~winner/data/nfl2008_fga.csv
+## Perform initial data load, analysis, and clean up operations before starting
+## Question 4 solution
+
+
+
+## Load MASS library to use LDA function
+library(MASS)
+library(CCA)
+
+# Load 'factoextra' for visualization - Scree plot
+#install.packages("factoextra")
+library(factoextra)
+
+
+
+## Read in the NFL dataset
+link='http://users.stat.ufl.edu/~winner/data/nfl2008_fga.csv'
+datasetNFL=read.csv(link)
+## Brief Review of number of rows, head and tail of dataset records 
+## the and structure of dataset
+nrow(datasetNFL)
+head(datasetNFL)
+tail(datasetNFL)
+str(datasetNFL)
+
+
+## Minor Clean up of NFL dataset
+sum(is.na(datasetNFL))
+datasetNFL <- na.omit(datasetNFL)
+sum(is.na(datasetNFL))
+nrow(datasetNFL) # Confirm rows after missing data removed = 1037
+
+
+
+
+
+## Q. 4(Part 1) 
+
+## Use LDA to classify the dataset into a small number of classes so that at least 
+## 90% of the information of the dataset is explained through new classification. 
+## (Hint: model the variable “qtr” to variables “togo”, “kicker”, and “ydline”). 
+## How many LDs do you choose? Explain the reason.
+
+
+
+# Display the values for 'qtr'
+table(datasetNFL$qtr)
+
+
+
+
+## Use LDA function to classify dataset. The output variable is 'qtr' and the input variables are
+##'togo', 'kicker', and 'ydline'.  
+datasetNFL.lda <- lda(qtr~togo+kicker+ydline, data=datasetNFL)
+datasetNFL.lda
+
+## Two LDs are required - LD1 and LD2 - to explain at least 90% of formation of the NFL dataset 
+## Reading values under the 'Proportion of trace:' output I can see...
+## LD1 explains 61.5%. LD2 explains a further 32.2%. Hence LD1 and LD2 will explain 93.7 % together.
+
+
+
+
+## Q. 4(Part 2) 
+
+## Apply PCA, and identify the important principle components involving at least 90% of dataset variation. 
+## Explain your decision strategy?
+
+## We only use the input variables for the PCA question.This analysis is a type of 'unsupervised' learning.
+## Just focusing on raw data on 'togo', 'kicker', and 'ydline' from
+## dataset and extracting PCs from the correlation matrix
+
+## I could have used the cbind(datasetNFL$togo, datasetNFL$kicker, datasetNFL$ydline) function
+## but I want to preserve the dataset column names
+datasetNFL2 = datasetNFL[10:12] # datasetNFL$togo, datasetNFL$kicker, datasetNFL$ydline
+fit <- princomp(datasetNFL2, cor = TRUE)
+summary(fit) # Print variance
+
+
+## Looking at the 'Cumulative Proportion' output line we can see that Comp1 captures 43.8% of dataset variation.
+## Comp 1 and Comp2 togther capture 77.2% (approx) of dataset variation.
+## However, all three components (Comp1, Comp2, Comp3) are important to capture 90% of the dataset variation.
+
+
+## Plot principle components versus their variance 
+## (Hint: to sketch the plot use the Scree plot).
+
+#
+## Use function to extract loadings for factor analysis - small loadings are usually not printed.
+loadings(fit) # PC loadings
+
+#
+## Visualize eigenvalues (scree plot). Show the percentage of variances explained by each principal component.
+fviz_eig(fit)
+
+# <Insert graph here>
+
+#
+plot(fit, type = "lines") # Another Scree Plot view. A plot of variation
+
+#
+## <Insert graph here>
+## Component 2 is just on or over the Variance value of '1' so I can determine that Component 1 and 2 are the most
+## important components to consider.
+## However, in order to meet the 90% level of variance requested in this question we still need to consider Component 3.
+
+
+biplot(fit) # Graph that shows two components and role of each variable (relationship between components and variables)
+
+#
+# <Insert graph here>
+## For example, as you increase 'ydline' there is an noticeable increase in Component 1
+## An increase in 'ydline' shows a very minor increase in Component 2
+
+
+
+#
+## The Plots confirms that all three components are important to capture 90%. 
+## There is no 'bend' in the line indicating that higher components contribute less to the capture 
+## of dataset variation
+
+
+
+## Q. 4(Part 3)
+
+## Split the dataset into two sets of variables so that X=(togo, kicker, ydline) and Y=(distance, homekick). 
+## Apply canonical correlation analysis to find the cross-correlation between X and Y. 
+
+
+## Set up 'X' variable
+X <- cbind(datasetNFL$togo, datasetNFL$kicker, datasetNFL$ydline)
+
+## Set up 'Y' variable 
+Y <- cbind(datasetNFL$distance, datasetNFL$homekick)
+
+## Run 'cor' function to produce Correlation Matrix
+cor(X, Y)
+
+
+## What is the correlation between 'ydline' and 'distance'?
+
+## Read three down the X value and one across the Y value
+## The correlation between 'ydline' and 'distance' is equal to '0.998947222'
+## This value shows a high level of correlation between the 'ydline' and 'distance' values
+
+
+
+
+
+
+
+## Q. 4(Part 4) 
+
+## Use K-means clustering analysis to identify the most important classes. 
+## How many classes do you select? Why?
+
+## Again consider the input variables. We use the 'datasetNFL2' dataset because I want to 
+## just consider the 'togo', 'kicker', and 'ydline' input variables.
+
+
+
+# Generate the plot K-Means clustering
+## Write function for plot generation
+wssplot <- function(datasetNFL2, nc=10, seed=2343){
+  
+  wss <- (nrow(datasetNFL2)-1) * sum(apply(datasetNFL2, 2, var))
+  
+  for (i in 2 : nc){
+    
+    set.seed(seed)
+    wss[i] <- sum(kmeans(datasetNFL2, centers = i)$withinss)
+    
+  }
+  
+  plot(1:nc, wss, type = "b", xlab = "Numbers of Clusters", ylab = "Within Groups Sum of Squares")
+  
+  
+}
+
+# Invoke plot function 
+wssplot(datasetNFL2, nc = 10) 
+# Use a default of number of classes = 10 to start the analysis
+
+# <Insert Graph here..>
+
+
+#
+## In the Cluster graph we can see a definite 'elbow' at Number of Clusters = 4.
+## After Cluster 4 the changes in variation are noticeably less 
+## Therefore the main cluster are clusters 1 through to cluster 4.  
+## We would select four classes as an answer to this question.
+
+
+## K-Means : Clustering Analysis on NFL Dataset
+k.means.fit <- kmeans(datasetNFL2, 4) # k = 4, the number of classes in type (see above)
+attributes(k.means.fit)
+
+## Centroids(arithmetic mean)
+k.means.fit$centers
+
+## Cluster size - shows the breakdown of the number of datapoints in the NFL dataset
+## into my chosen cluster grouping
+k.means.fit$size
+
+## All value above sum to 1037, which is the size of the dataset (rows)
+
+
+  
+  
+  
+  
+  
+  
+  
+
